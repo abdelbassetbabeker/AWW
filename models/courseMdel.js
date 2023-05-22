@@ -32,14 +32,14 @@ const courseSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Semester'
     },
-    teacher_id: [
-        {
-            _id: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'Teacher'
-            }
-        }
-    ]
+    // teacher_id: [
+    //     {
+    //         _id: {
+    //             type: mongoose.Schema.Types.ObjectId,
+    //             ref: 'Teacher'
+    //         }
+    //     }
+    // ]
 }, {
     timestamps: true
 })

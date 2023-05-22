@@ -1,6 +1,9 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js'
+import swaggerUi from "swagger-ui-express"
+import cors from 'cors';
+
 
 // used Middlewares
 import { errorHandler, notFound } from './Middleware/errorMiddleware.js';
@@ -16,12 +19,15 @@ import {
     studentRouter,
     teacherRouter
 } from './routes/adminRoutes.js'
+
 import authRoutes from './routes/authRoutes.js'
 
+import studentsRouter from './routes/studentRoutes.js'
 
 
 // Importing teacher The Routes 
 import teachersRouter from './routes/teacherRoutes.js'
+import swaggerDoc from './utils/swagger.js';
 
 
 
@@ -37,11 +43,22 @@ app.use(setUser);
 
 
 
+// Enable CORS for all routes
+app.use(cors());
+
+
+// swgger For Routs Documentations 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+
+
+
+
+
 
 // Routes
 
-//Publick Routes
-app.use('/api/users', authRoutes);
+//Publick Routes login route
+app.use('/api', authRoutes);
 
 
 
@@ -66,7 +83,7 @@ app.use('/api/teacher', teachersRouter);
 
 
 // Student Routes
-// app.use('/api/students', studentRoutes);
+app.use('/api/students', studentsRouter);
 
 
 

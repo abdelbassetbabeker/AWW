@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 
 const courseReclamationSchema = mongoose.Schema({
 
-    user_id: {
+    student_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'Student'
     },
-    teacher_id: {
+    course_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Teacher'
+        ref: 'Course'
     },
     body: {
         type: String,
@@ -21,7 +21,7 @@ const courseReclamationSchema = mongoose.Schema({
     },
     response: {
         type: String,
-        required: false
+        required: false,
     }
 
 }, {

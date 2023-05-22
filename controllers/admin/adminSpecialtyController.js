@@ -18,7 +18,7 @@ export const createSpecialty = asyncHandler(async (req, res) => {
     const existingSpecialty = await Specialty.findOne({ name });
 
     if (existingSpecialty) {
-        res.status(400);
+        res.status(409);
         throw new Error("Specialty Name already exists !");
     }
 
@@ -31,7 +31,8 @@ export const createSpecialty = asyncHandler(async (req, res) => {
                 department_id,
             });
 
-            res.status(201).json(newSpecialty);
+            res.status(201).json({ message: 'Specialty Created Successfully' });
+
         } catch (error) {
             res.status(400);
             throw new Error("Bad Request");
@@ -55,9 +56,8 @@ export const deleteSpecialty = asyncHandler(async (req, res) => {
         try {
             const specialtyDeleted = await Specialty.findByIdAndDelete(req.params.id)
             res.status(200).json({ message: "Specialty Deleted.." })
-            console.log(req.params.id);
         } catch (error) {
-            res.status(400)
+            res.status(404)
             throw new Error('Specialty Not found ...')
         }
     } else {
@@ -87,7 +87,7 @@ export const updateSpecialty = asyncHandler(async (req, res) => {
     }
     const existingSpecialty = await User.findOne({ name });
     if (existingSpecialty) {
-        res.status(400);
+        res.status(409);
         throw new Error("Specialty Name already exists !");
     }
 
@@ -96,8 +96,9 @@ export const updateSpecialty = asyncHandler(async (req, res) => {
         specialty.name = name || specialty.name;
         specialty.department_id = department_id || specialty.department_id;
 
-        const updatedSpecialty = await specialty.save();
-        res.json({ message: "Specialty updated successfully" });
+        await specialty.save();
+        res.status(200).json({ message: "Specialty updated successfully" });
+
     } catch (error) {
         res.status(400);
         throw new Error("Error fields are empty...");
@@ -107,18 +108,29 @@ export const updateSpecialty = asyncHandler(async (req, res) => {
 
 
 
-
-//@Des      fetch all specialties
-//@route    GET
-//@access   Protected
+//@Desc      Fetch all specialties by department
+//@route     GET /api/specialties
+//@access    Protected
 export const getSpecialties = asyncHandler(async (req, res) => {
-    const specialties = await Specialty.find({})
-    res.send(specialties)
-    res.status(200)
+    const { id } = req.query;
+
+    try {
+        let specialties;
+        if (id) {
+            specialties = await Specialty.find({ department_id: id });
+        } else {
+            specialties = await Specialty.find();
+        }
+
+        if (specialties.length > 0) {
+            res.status(200).json(specialties);
+        } else {
+            res.status(404).json({ message: "Specialties not found" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
 });
-
-
-
 
 
 

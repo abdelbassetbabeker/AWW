@@ -1,6 +1,7 @@
 import express from "express";
-import { updateCourse } from "../controllers/teacher/courseTeacherEditController.js";
-import { updateGrade } from "../controllers/teacher/gradeEditeController.js";
+import { getCourse, updateCourse } from "../controllers/teacher/courseTeacherEditController.js";
+import { studentGrade, updateGrade } from "../controllers/teacher/gradeController.js";
+import { reclamationResponse, reclamations } from "../controllers/teacher/reclamationController.js";
 import { studentList } from "../controllers/teacher/studentListController.js";
 
 import { authRole, authUser } from "../Middleware/authMiddleware.js";
@@ -18,9 +19,13 @@ const router = express.Router();
 
 
 router.put('/course', authUser, authRole('teacher'), updateCourse)
-router.put('/grade/:id', authUser, authRole('teacher'), updateGrade)
+router.get('/course', authUser, authRole('teacher'), getCourse)
+router.put('/grade/:studentID', authUser, authRole('teacher'), updateGrade)
+router.get('/grade/:studentID', authUser, authRole('teacher'), studentGrade)
 router.get('/', authUser, authRole('teacher'), studentList)
 
+router.get('/reclamations', authUser, authRole('teacher'), reclamations)
+router.post('/reclamations/:studentID', authUser, authRole('teacher'), reclamationResponse)
 
 
 export default router; 

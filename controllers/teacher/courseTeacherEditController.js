@@ -19,6 +19,10 @@ export const updateCourse = asyncHandler(async (req, res) => {
     } = req.body;
 
     const { course_id } = await Teacher.findOne({ user_id: req.user._id });
+    if (!course_id) {
+        res.status(404);
+        throw new Error("Not Found");
+    }
     const course = await Course.findById(course_id);
 
     try {
@@ -30,13 +34,37 @@ export const updateCourse = asyncHandler(async (req, res) => {
             res.json({ message: "informations updated successfully" });
         }
         else {
-            res.status(404);
+            res.status(400);
             throw new Error("Some Fields are Missed Empty..");
         }
     } catch (error) {
         res.status(400);
         throw new Error("Bad Request");
     }
+});
+
+
+
+
+
+
+//@Des      get Teacher course
+//@route    GET
+//@access   Protected 
+//@role     teacher 
+export const getCourse = asyncHandler(async (req, res) => {
+
+    try {
+        const { course_id } = await Teacher.findOne({ user_id: req.user._id });
+        const courseInfo = await Course.findOne({ _id: course_id }).select('name _id semester_id coefficient control_porc tp_td_porc');
+        // Update fields
+        res.status(200).json(courseInfo)
+
+    } catch (error) {
+        res.status(400);
+        throw new Error("Bad Request");
+    }
+
 });
 
 

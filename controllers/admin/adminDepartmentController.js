@@ -12,7 +12,7 @@ export const createDepartment = asyncHandler(async (req, res) => {
     const existingDepartment = await Department.findOne({ name });
 
     if (existingDepartment) {
-        res.status(400);
+        res.status(409);
         throw new Error("Department Name already exists !");
     }
 
@@ -23,7 +23,7 @@ export const createDepartment = asyncHandler(async (req, res) => {
                 name,
             });
 
-            res.status(201).json(newDepartment);
+            res.status(201).json({ message: 'Department Created Successfully' });
         } catch (error) {
             res.status(400);
             throw new Error("Bad Request");
@@ -46,7 +46,7 @@ export const deleteDepartment = asyncHandler(async (req, res) => {
             );
             res.status(200).json({ message: "Department Deleted.." });
         } catch (error) {
-            res.status(400);
+            res.status(404);
             throw new Error("Department Not found ...");
         }
     } else {
@@ -70,50 +70,61 @@ export const updateDepartment = asyncHandler(async (req, res) => {
 
     const existingDepartment = await Department.findOne({ name });
     if (existingDepartment && existingDepartment._id != req.params.id) {
-        res.status(400);
+        res.status(409);
         throw new Error("Department Name already exists !");
     }
 
     try {
         // Update fields
         department.name = name || department.name;
+        await department.save();
 
-        const updatedDepartment = await department.save();
-        res.json({ message: "Department updated successfully" });
+        res.status(200).json({ message: "Department updated successfully" });
+
     } catch (error) {
         res.status(400);
         throw new Error("Bad Request");
     }
 });
 
+
+
+
+
 //@Des      fetch all departments
 //@route    GET
 //@access   Protected
 export const getDepartments = asyncHandler(async (req, res) => {
     const departments = await Department.find({});
-    res.send(departments);
-    res.status(200);
+    if (departments) {
+        res.send(departments);
+        res.status(200);
+    } else {
+        res.send([]);
+        res.status(200);
+    }
 });
+
+
+
+
 
 //@Des      find department by id 
 //@route    GET
 //@access   Protected
 export const getDepartmentById = asyncHandler(async (req, res) => {
-    try {
-        if (req.params.id) {
-            const department = await Department.findById(req.params.id);
-            if (department) {
-                res.send(department);
-                res.status(200);
-            } else {
-                res.status(404).json({ message: "Department not found..!" });
-            }
+
+    if (req.params.id) {
+        const department = await Department.findById(req.params.id);
+        if (department) {
+            res.send(department);
+            res.status(200);
         } else {
-            res.status(400);
-            throw new Error("bad request");
+            res.status(404).json({ message: "Department not found..!" });
         }
-    } catch (error) {
+    } else {
         res.status(400);
         throw new Error("bad request");
     }
+
 });

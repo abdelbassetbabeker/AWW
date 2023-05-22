@@ -26,11 +26,11 @@ export const createTeacher = asyncHandler(async (req, res) => {
     const existingPhone = await Teacher.findOne({ phone });
 
     if (existingEmail) {
-        res.status(400);
+        res.status(409);
         throw new Error("Email already exists");
     }
     if (existingPhone) {
-        res.status(400);
+        res.status(409);
         throw new Error("Phone already exists");
     }
 
@@ -53,15 +53,16 @@ export const createTeacher = asyncHandler(async (req, res) => {
                 course_id,
             });
 
-            res.status(201).json(newTeacher);
+            res.status(201).json({ message: 'Teacher Created Successfully' });
 
         } catch (error) {
-            res.status(400).json({ error });
+            res.status(400);
+            throw new Error("Bad request");
 
         }
     } else {
         res.status(400);
-        throw new Error("Error fields are empty...");
+        throw new Error("Bad request");
     }
 });
 
@@ -74,16 +75,19 @@ export const createTeacher = asyncHandler(async (req, res) => {
 //@access   Protected
 //@role     admin 
 export const deleteTeacher = asyncHandler(async (req, res) => {
+
     if (req.params.id) {
         try {
+
             const { user_id } = await Teacher.findById(req.params.id)
             const { _id } = await User.findById(user_id)
-            const userDeleted = await User.findByIdAndDelete(_id)
-            const studentsdeleted = await Teacher.findByIdAndDelete(req.params.id)
+            await User.findByIdAndDelete(_id)
+            await Teacher.findByIdAndDelete(req.params.id)
             res.status(200).json({ message: "Teacher Deleted.." })
-            console.log(req.params.id);
+
         } catch (error) {
-            res.status(400)
+
+            res.status(404)
             throw new Error('Teacher or user Not found ...')
         }
     }
@@ -137,9 +141,10 @@ export const updateTeacher = asyncHandler(async (req, res) => {
         teacher.gender = gender || teacher.gender;
         teacher.course_id = course_id || teacher.course_id;
 
-        const updatedTeacher = await teacher.save();
-        const updatedUser = await user.save();
+        await teacher.save();
+        await user.save();
 
+        res.status(204);
         res.json({ message: "profile Updated" });
 
     } catch (error) {
@@ -157,9 +162,11 @@ export const updateTeacher = asyncHandler(async (req, res) => {
 //@route    GET
 //@access   Protected
 export const getTeachers = asyncHandler(async (req, res) => {
-    const teachers = await Teacher.find({})
-    res.send(teachers)
+
+    const teachers = await Teacher.find({}).populate('course_id', 'name');
     res.status(200)
+    res.send(teachers)
+
 });
 
 
@@ -170,6 +177,7 @@ export const getTeachers = asyncHandler(async (req, res) => {
 //@route    GET
 //@access   Protected
 export const getTeacherById = asyncHandler(async (req, res) => {
+
     try {
         if (req.params.id) {
             const teacher = await Teacher.findById(req.params.id)
@@ -177,7 +185,8 @@ export const getTeacherById = asyncHandler(async (req, res) => {
                 res.send(teacher)
                 res.status(200)
             } else {
-                res.status(404).json({ message: "teacher not found..!" })
+                res.status(404);
+                throw new Error("teacher not found..!");
             }
         }
         else {
@@ -188,6 +197,7 @@ export const getTeacherById = asyncHandler(async (req, res) => {
         res.status(400)
         throw new Error("bad request")
     }
+
 });
 
 

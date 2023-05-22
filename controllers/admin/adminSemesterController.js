@@ -16,7 +16,7 @@ export const createSemester = asyncHandler(async (req, res) => {
     const existingSemester = await Semester.findOne({ name });
 
     if (existingSemester) {
-        res.status(400);
+        res.status(409);
         throw new Error("Semester Name already exists !");
     }
 
@@ -27,7 +27,7 @@ export const createSemester = asyncHandler(async (req, res) => {
             department_id
         });
 
-        res.status(201).json(newSemester);
+        res.status(201).json({ message: 'Semester Created Successfully' });
     } catch (error) {
         res.status(400);
         throw new Error("Bad Request");
@@ -43,7 +43,7 @@ export const createSemester = asyncHandler(async (req, res) => {
 export const deleteSemester = asyncHandler(async (req, res) => {
     if (req.params.id) {
         try {
-            const SemesterDeleted = await Semester.findByIdAndDelete(req.params.id)
+            await Semester.findByIdAndDelete(req.params.id)
             res.status(200).json({ message: "Semester Deleted.." })
         } catch (error) {
             res.status(400)
@@ -103,9 +103,18 @@ export const updateSemester = asyncHandler(async (req, res) => {
 //@route    GET
 //@access   Protected
 export const getSemesters = asyncHandler(async (req, res) => {
-    const Semesters = await Semester.find({})
-    res.send(Semesters)
-    res.status(200)
+
+    try {
+        let semesters = await Semester.find();
+
+        if (semesters.length > 0) {
+            res.status(200).json(semesters);
+        } else {
+            res.status(404).json({ message: "Specialties not found" });
+        }
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
 });
 
 

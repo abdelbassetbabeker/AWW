@@ -20,18 +20,6 @@ const studentSchema = mongoose.Schema({
     gender: {
         type: String,
         required: true
-    },
-    level: {
-        type: String,
-        required: true
-    },
-    specialty_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Specialty'
-    },
-    department_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Department'
     }
 }, {
     timestamps: true

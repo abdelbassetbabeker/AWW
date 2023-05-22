@@ -5,7 +5,7 @@ import asynchHandler from "express-async-handler";
 
 export const authUser = asynchHandler(async (req, res, next) => {
     if (req.user == null) {
-        res.status(403)
+        res.status(401)
         throw new Error("login first..!")
     }
     next()
@@ -15,7 +15,7 @@ export const authUser = asynchHandler(async (req, res, next) => {
 export const authRole = (role) => {
     return asynchHandler(async (req, res, next) => {
         if (req.user.role !== role) {
-            res.status(401)
+            res.status(403)
             throw new Error('Not Allowed')
         }
         next()

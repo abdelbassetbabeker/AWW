@@ -14,36 +14,31 @@ export const createCourse = asyncHandler(async (req, res) => {
     const {
         name,
         coefficient,
-        control_porc,
-        tp_td_porc,
         specialty_id,
         semester_id,
-        teacher_id,
     } = req.body;
 
     // Check if course already exists
     const existingCourse = await Course.findOne({ name });
 
     if (existingCourse) {
-        res.status(400);
+        res.status(409); // Conflict
         throw new Error("Course Name all already exists !");
     }
 
-
-    if (name && coefficient && semester_id && teacher_id && specialty_id) {
+    res.json
+    // if (name && coefficient && semester_id && teacher_id && specialty_id) {
+    if (name && coefficient && semester_id && specialty_id) {
         try {
             const newCourse = await Course.create({
                 user: req.user.id,
                 name,
                 coefficient,
-                control_porc,
-                tp_td_porc,
                 specialty_id,
                 semester_id,
-                teacher_id,
             });
 
-            res.status(201).json(newCourse);
+            res.status(201).json({ message: 'course Created Successfully' });
         } catch (error) {
             res.status(400);
             throw new Error("Bad Request");
@@ -66,10 +61,9 @@ export const deleteCourse = asyncHandler(async (req, res) => {
     if (req.params.id) {
         try {
             const courseDeleted = await Course.findByIdAndDelete(req.params.id)
-            res.status(200).json({ message: "Course Deleted.." })
-            console.log(req.params.id);
+            res.status(204).json({ message: "Course Deleted.." }) // or 200
         } catch (error) {
-            res.status(400)
+            res.status(404)
             throw new Error('Course Not found ...')
         }
     } else {
@@ -94,7 +88,7 @@ export const updateCourse = asyncHandler(async (req, res) => {
         tp_td_porc,
         specialty_id,
         semester_id,
-        teacher_id,
+        // teacher_id,
     } = req.body;
 
     const course = await Course.findById(req.params.id);
@@ -104,7 +98,7 @@ export const updateCourse = asyncHandler(async (req, res) => {
     }
     const existingCourse = await User.findOne({ name });
     if (existingCourse) {
-        res.status(400);
+        res.status(409);
         throw new Error("Course Name all already exists !");
     }
 
@@ -116,7 +110,7 @@ export const updateCourse = asyncHandler(async (req, res) => {
         course.tp_td_porc = tp_td_porc || course.tp_td_porc;
         course.specialty_id = specialty_id || course.specialty_id;
         course.semester_id = semester_id || course.semester_id;
-        course.teacher_id = teacher_id || course.teacher_id;
+        // course.teacher_id = teacher_id || course.teacher_id;
 
         const updatedCourse = await course.save();
         res.json({ message: "Course updated successfully" });
@@ -135,7 +129,7 @@ export const updateCourse = asyncHandler(async (req, res) => {
 //@access   Protected
 export const getCourses = asyncHandler(async (req, res) => {
     const courses = await Course.find({})
-    res.send(courses)
+    res.json(courses)
     res.status(200)
 });
 
@@ -151,7 +145,7 @@ export const getCourseById = asyncHandler(async (req, res) => {
         if (req.params.id) {
             const course = await Course.findById(req.params.id)
             if (course) {
-                res.send(course)
+                res.json(course)
                 res.status(200)
             } else {
                 res.status(404).json({ message: "course not found..!" })
